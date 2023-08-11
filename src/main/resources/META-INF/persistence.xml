@@ -17,7 +17,10 @@
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="true"/>
             <property name="hibernate.jdbc.batch_size" value="10"/>
-            <!--<property name="hibernate.hbm2ddl.auto" value="create" />-->
+            <property name="hibernate.hbm2ddl.auto" value="create" />
+            <!-- 객체 필드 추가 시 alter로 컬럼 추가, 객체 필드 지워도 컬럼 지워지지는 않음 -->
+<!--            <property name="hibernate.hbm2ddl.auto" value="update" />-->
+            <!-- 웬만하면 테스트 서버에도 스크립트 직접 짜서 적용하는게 좋음 -->
         </properties>
     </persistence-unit>
 </persistence>

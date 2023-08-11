@@ -187,6 +187,7 @@ public class JpaMain {
 */
 
         //준영속
+/*
         try {
 
             Member member = em.find(Member.class, 150L); //DB에서 조회해서 1차 캐시에 올림 -> 영속 상태
@@ -198,6 +199,58 @@ public class JpaMain {
             Member member2 = em.find(Member.class, 150L); //조회 쿼리 또 나감
 
             System.out.println("================");
+            tx.commit();
+        } catch(Exception e) {
+            tx.rollback();
+        } finally {
+            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
+        }
+*/
+
+/*
+        try {
+
+            Member member = new Member();
+            member.setUsername("C");
+
+            System.out.println("==================");
+            em.persist(member);
+            System.out.println("member.id = " + member.getId());
+            System.out.println("==================");
+
+            tx.commit();
+        } catch(Exception e) {
+            tx.rollback();
+        } finally {
+            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
+        }
+*/
+
+        try {
+
+            Member member1 = new Member();
+            member1.setUsername("A");
+
+            Member member2 = new Member();
+            member2.setUsername("B");
+
+            Member member3 = new Member();
+            member3.setUsername("C");
+
+            System.out.println("==================");
+
+            em.persist(member1); //1, 51
+            em.persist(member2); //101
+            em.persist(member3); //MEM
+            em.persist(member3); //MEM
+            em.persist(member3); //MEM
+
+            System.out.println("member1 = " + member1.getId());
+            System.out.println("member2 = " + member2.getId());
+            System.out.println("member3 = " + member3.getId());
+
+            System.out.println("==================");
+
             tx.commit();
         } catch(Exception e) {
             tx.rollback();
