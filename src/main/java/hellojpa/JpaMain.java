@@ -239,10 +239,8 @@ public class JpaMain {
 
             System.out.println("==================");
 
-            em.persist(member1); //1, 51
+            em.persist(member1); //51
             em.persist(member2); //101
-            em.persist(member3); //MEM
-            em.persist(member3); //MEM
             em.persist(member3); //MEM
 
             System.out.println("member1 = " + member1.getId());

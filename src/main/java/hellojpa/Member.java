@@ -28,7 +28,7 @@ public class Member {
     //not null 제약조건
 //    @Column(name = "name", nullable = false)
     //제약조건 이름이 랜덤이라 잘 안씀, @Table의 uniqueConstraints는 이름 지정 가능해 이걸로 씀
-//    @Column(name = "name", nullable = true)
+//    @Column(name = "name", nullable = false, unique = true)
     // varchar(10)
 //    @Column(name = "name", length = 10)
     //컬럼 정보를 직접 줄 수 있다. (문구가 그대로 DDL문에 들어감)
