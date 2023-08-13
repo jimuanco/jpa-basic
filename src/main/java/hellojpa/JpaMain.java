@@ -13,197 +13,71 @@ public class JpaMain {
 
         EntityManager em = emf.createEntityManager();
 
-        //JPA는 데이터 변경할 때 트랜잭션안에서 작업
         EntityTransaction tx = em.getTransaction();
         tx.begin();
 
-        //회원 등록
 /*
         try {
+
+            Team team = new Team();
+            team.setName("TeamA");
+            em.persist(team); //pk값 셋팅 되고 영속 상태 됨
+
             Member member = new Member();
-            member.setId(2L);
-            member.setName("HelloA");
-
+            member.setUsername("member1");
+            member.setTeamId(team.getId());
             em.persist(member);
+            System.out.println("==============");
+            // select * from member m join team t on m.team_id = t.team_id;
+
+            Member findMember = em.find(Member.class, member.getId());
+
+            Long findTeamId = findMember.getTeamId();
+            Team findTeam = em.find(Team.class, findTeamId);
 
             tx.commit();
         } catch(Exception e) {
             tx.rollback();
         } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
+            em.close();
         }
 */
 
-        //회원 삭제
 /*
         try {
 
-            Member findMember = em.find(Member.class, 1L);
+            Team team = new Team();
+            team.setName("TeamA");
+            em.persist(team);
 
-            em.remove(findMember);
+            Member member = new Member();
+            member.setUsername("member1");
+            member.setTeam(team);
+            em.persist(member);
+            System.out.println("===============");
 
-            tx.commit();
-        } catch(Exception e) {
-            tx.rollback();
-        } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
-        }
-*/
+            em.flush(); //영속성 컨텍스트 -> DB 쿼리
+            em.clear(); //영속성 컨텍스트 초기화
 
-        //회원 수정
-/*
-        try {
+            Member findMember = em.find(Member.class, member.getId());
 
-            Member findMember = em.find(Member.class, 1L);
-            findMember.setName("HelloJPA");
+//            Team findTeam = findMember.getTeam();
+//            System.out.println("findTeam = " + findTeam.getName());
 
-            tx.commit(); //커밋직전에 update 쿼리 날림
-        } catch(Exception e) {
-            tx.rollback();
-        } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
-        }
-*/
+            //DB에 100번 Team이 있다면
+//            Team newTeam = em.find(Team.class, 100L);
+//            findMember.setTeam(newTeam); //DB의 외래키 값 업데이트 됨
 
-        //JPQL
-/*
-        try {
-            //pagination 가능
-            List<Member> result = em.createQuery("select m from Member as m", Member.class)
-                    .setFirstResult(0)
-                    .setMaxResults(2)
-                    .getResultList();
-
-            for (Member member : result) {
-                System.out.println("member.name = " + member.getName());
+            List<Member> members = findMember.getTeam().getMembers();
+            for (Member m : members) {
+                System.out.println("m = " + m.getUsername());
             }
 
             tx.commit();
         } catch(Exception e) {
             tx.rollback();
         } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
-        }
-*/
-        //비영속, 영속
-/*
-        try {
-
-            //비영속
-            Member member = new Member();
-            member.setId(101L);
-            member.setName("HelloJPA");
-
-            //영속
-            System.out.println("=== BEFORE ===");
-            em.persist(member); //여기서 DB에 저장 되지 않는다.(쿼리X), 1차 캐시에 저장
-//            em.detach(member); //준영속
-            System.out.println("=== AFTER ===");
-
-            Member findMember = em.find(Member.class, 101L); //1차 캐시에서 가져와 조회 쿼리X
-
-            System.out.println("findMember.id = " + findMember.getId());
-            System.out.println("findMember.name = " + findMember.getName());
-
-            tx.commit(); //영속성 컨텍스트에 있는애가 DB 쿼리로 날라감
-        } catch(Exception e) {
-            tx.rollback();
-        } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
-        }
-*/
-
-        //조회 쿼리 한 번
-/*
-        try {
-
-            Member findMember1 = em.find(Member.class, 101L); //쿼리 나감
-            Member findMember2 = em.find(Member.class, 101L); //1차 캐시에서 조회
-
-            //영속 엔티티의 동일성 보장
-            System.out.println("result = " + (findMember1 == findMember2));
-
-            tx.commit();
-        } catch(Exception e) {
-            tx.rollback();
-        } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
-        }
-*/
-
-        //트랜잭션을 지원하는 쓰기 지연
-/*
-        try {
-
-            Member member1 = new Member(150L, "A");
-            Member member2 = new Member(160L, "B");
-
-            em.persist(member1);
-            em.persist(member2);
-
-            System.out.println("================"); // 이후에 쿼리 나감 (<property name="hibernate.jdbc.batch_size" value="10"/> 설정 만큼 한번에 보냄)
-
-            tx.commit();
-        } catch(Exception e) {
-            tx.rollback();
-        } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
-        }
-*/
-
-        //변경 감지(Dirty Checking)
-/*
-        try {
-
-            Member member = em.find(Member.class, 150L);
-            member.setName("ZZZZ");
-
-            System.out.println("================");
-
-            tx.commit();
-        } catch(Exception e) {
-            tx.rollback();
-        } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
-        }
-*/
-
-        //플러시
-/*
-        try {
-
-            Member member = new Member(200L, "member200");
-            em.persist(member);
-
-            em.flush(); //1차 캐시가 지워지는게 아님
-
-            System.out.println("================"); //이전에 insert 쿼리 나감
-            tx.commit();
-        } catch(Exception e) {
-            tx.rollback();
-        } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
-        }
-*/
-
-        //준영속
-/*
-        try {
-
-            Member member = em.find(Member.class, 150L); //DB에서 조회해서 1차 캐시에 올림 -> 영속 상태
-            member.setName("AAAA");
-
-//            em.detach(member); //준영속 -> update 쿼리가 안나감
-            em.clear(); //영속성 컨텍스트 초기화
-
-            Member member2 = em.find(Member.class, 150L); //조회 쿼리 또 나감
-
-            System.out.println("================");
-            tx.commit();
-        } catch(Exception e) {
-            tx.rollback();
-        } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
+            em.close();
         }
 */
 
@@ -211,51 +85,76 @@ public class JpaMain {
         try {
 
             Member member = new Member();
-            member.setUsername("C");
-
-            System.out.println("==================");
+            member.setUsername("member1");
             em.persist(member);
-            System.out.println("member.id = " + member.getId());
-            System.out.println("==================");
+
+            Team team = new Team();
+            team.setName("TeamA");
+            team.getMembers().add(member); //연관관계 주인이 아님 -> 읽기 전용, add 안됨
+            em.persist(team);
+
+            em.flush();
+            em.clear();
 
             tx.commit();
         } catch(Exception e) {
             tx.rollback();
         } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
+            em.close();
         }
 */
 
         try {
 
-            Member member1 = new Member();
-            member1.setUsername("A");
+            Team team = new Team();
+            team.setName("TeamA");
+            em.persist(team);
 
-            Member member2 = new Member();
-            member2.setUsername("B");
+            Member member = new Member();
+            member.setUsername("member1");
+//            member.setTeam(team);
+            member.changeTeam(team); //연관관계 편의 메소드
+            em.persist(member);
 
-            Member member3 = new Member();
-            member3.setUsername("C");
+//            team.addMember(member); //연관관계 편의 메소드는 둘 중에 한 군데서만 하자
 
-            System.out.println("==================");
+            //양쪽에 다 값을 셋팅 해줘야 한다.
+            //1. 객체 지향적
+            //2. Test case 작성시 -> JPA 없이 동작
+//            team.getMembers().add(member); //연관관계 편의 메소드를 만들고 이건 지우자
 
-            em.persist(member1); //51
-            em.persist(member2); //101
-            em.persist(member3); //MEM
+//            em.flush();
+//            em.clear();
 
-            System.out.println("member1 = " + member1.getId());
-            System.out.println("member2 = " + member2.getId());
-            System.out.println("member3 = " + member3.getId());
+            Team findTeam = em.find(Team.class, team.getId()); //1차 캐시
+            //em.flush(), em.clear()가 없다면 위의 em.find()는 1차캐시에서 가져옴.
+            // -> team.getMembers().add(member); 안해주면 members가 없음
+            List<Member> members = findTeam.getMembers();
 
-            System.out.println("==================");
+//            System.out.println("findTeam = " + findTeam); //lombok으로 toString()을 양쪽에 생성 한다면 무한루프
+            //컨트롤러에서 Entity를 반환하지 말자! 무한루프 문제, Entity 변경 시 API 스펙 변경. 따라서 DTO로 변환해 반환 하기
+
+            System.out.println("=================");
+            //em.flush(), em.clear()가 있다면 team.getMembers().add(member); 안해줘도 이시점에 select 쿼리 날림 (Lazy Loading)
+            // -> members 가져옴
+            for (Member m : members) {
+                System.out.println("m = " + m.getUsername());
+            }
+            System.out.println("=================");
 
             tx.commit();
         } catch(Exception e) {
             tx.rollback();
         } finally {
-            em.close(); //DB connection을 물고 동작하기 때문에 꼭 닫아줘야 해
+            em.close();
         }
 
         emf.close();
     }
 }
+
+// JPA 모델링 할 때 단방향 매핑으로 설계를 일단 끝낸다.
+// 객체 + 테이블 설계를 같이 가져가며 FK 파악 -> 다쪽 (ManyToOne, OneToOne)에서 단방향 매핑을 한다.
+// JPA에서의 설계는 단방향 매핑만으로 객체랑 테이블 매핑은 완료가 된다.
+// 애플리케이션 개발 단계에서 JPQL로 역방향으로 탐색할 일이 많다.
+// -> 양방향 매핑은 필요할 때 추가하면 된다. (테이블 변경 없이 엔티티에 코드만 추가하면 된다.)
