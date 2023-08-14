@@ -104,6 +104,7 @@ public class JpaMain {
         }
 */
 
+/*
         try {
 
             Team team = new Team();
@@ -148,6 +149,28 @@ public class JpaMain {
         } finally {
             em.close();
         }
+*/
+
+        try {
+
+            Member member = new Member();
+            member.setUsername("member1");
+
+            em.persist(member);
+
+            Team team = new Team();
+            team.setName("teamA");
+            team.getMembers().add(member);
+
+            em.persist(team);
+
+            tx.commit();
+        } catch(Exception e) {
+            tx.rollback();
+        } finally {
+            em.close();
+        }
+
 
         emf.close();
     }
