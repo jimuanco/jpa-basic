@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class JpaMain {
@@ -151,6 +152,7 @@ public class JpaMain {
         }
 */
 
+/*
         try {
 
             Member member = new Member();
@@ -170,7 +172,56 @@ public class JpaMain {
         } finally {
             em.close();
         }
+*/
 
+
+/*
+        try {
+
+            Movie movie = new Movie();
+            movie.setDirector("aaaa");
+            movie.setActor("bbbb");
+            movie.setName("바람과함께사라지다");
+            movie.setPrice(10000);
+
+            em.persist(movie);
+
+            em.flush();
+            em.clear();
+
+//            Movie findMovie = em.find(Movie.class, movie.getId());
+//            System.out.println("findMovie = " + findMovie);
+
+            //이 경우 TABLE_PER_CLASS 전략일때 union all로 다 뒤짐
+            Item item = em.find(Item.class, movie.getId());
+            System.out.println("item = " + item);
+
+            tx.commit();
+        } catch(Exception e) {
+            tx.rollback();
+        } finally {
+            em.close();
+        }
+*/
+
+        try {
+
+            Member member = new Member();
+            member.setUsername("user1");
+            member.setCreatedBy("Kim");
+            member.setCreatedDate(LocalDateTime.now());
+
+            em.persist(member);
+
+            em.flush();
+            em.clear();
+
+            tx.commit();
+        } catch(Exception e) {
+            tx.rollback();
+        } finally {
+            em.close();
+        }
 
         emf.close();
     }
