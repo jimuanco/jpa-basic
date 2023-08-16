@@ -14,13 +14,13 @@ public class Member extends BaseEntity {
     @Column(name = "USERNAME")
     private String username;
 
-    @ManyToOne
-    @JoinColumn(name = "TEAM_ID", insertable = false, updatable = false)
-    private Team team;
+//    @ManyToOne
+//    @JoinColumn(name = "TEAM_ID", insertable = false, updatable = false)
+//    private Team team;
 
-    @OneToOne
-    @JoinColumn(name = "LOCKER_ID")
-    private Locker locker;
+//    @OneToOne
+//    @JoinColumn(name = "LOCKER_ID")
+//    private Locker locker;
 
     @ManyToMany
     @JoinTable(name = "MEMBER_PRODUCT")
@@ -32,9 +32,10 @@ public class Member extends BaseEntity {
 //    @Column(name = "TEAM_ID")
 //    private Long teamId;
 
-//    @ManyToOne
-//    @JoinColumn(name = "TEAM_ID") //외래 키가 있는 곳을 연관관계 주인으로! -> 성능 이슈 없고, 객체 - 테이블 관계가 헷갈리지 않음
-//    private Team team;
+    @ManyToOne(fetch = FetchType.EAGER)
+//    @ManyToOne(fetch = FetchType.LAZY) //team을 프록시 객체로 조회
+    @JoinColumn(name = "TEAM_ID") //외래 키가 있는 곳을 연관관계 주인으로! -> 성능 이슈 없고, 객체 - 테이블 관계가 헷갈리지 않음
+    private Team team;
 
     public Long getId() {
         return id;
@@ -52,13 +53,13 @@ public class Member extends BaseEntity {
         this.username = username;
     }
 
-//    public Team getTeam() {
-//        return team;
-//    }
-//
-//    public void setTeam(Team team) {
-//        this.team = team;
-//    }
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
 //
 //    public void changeTeam(Team team) {
 //        this.team = team;

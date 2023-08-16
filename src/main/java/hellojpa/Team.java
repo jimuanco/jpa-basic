@@ -12,10 +12,10 @@ public class Team extends BaseEntity {
     private Long id;
     private String name;
 
-//    @OneToMany(mappedBy = "team")
-    @OneToMany
+    @OneToMany(mappedBy = "team")
+//    @OneToMany
 //    @JoinTable
-    @JoinColumn(name = "TEAM_ID")
+//    @JoinColumn(name = "TEAM_ID")
     private List<Member> members = new ArrayList<>(); //ArrayList로 초기화 -> add 할 떄 NullPointer 안뜸
 
 //    public void addMember(Member member) {
