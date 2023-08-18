@@ -7,6 +7,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.util.List;
+import java.util.Set;
 
 public class JpaMain {
 
@@ -473,6 +474,7 @@ public class JpaMain {
         }
 */
 
+/*
         try {
 
             Child child1 = new Child();
@@ -505,20 +507,167 @@ public class JpaMain {
         } finally {
             em.close();
         }
+*/
+
+/*
+        try {
+
+            Member member = new Member();
+            member.setUsername("hello");
+            member.setHomeAddress(new Address("city", "street", "10000"));
+            member.setWorkPeriod(new Period());
+
+            em.persist(member);
+
+            tx.commit();
+        } catch(Exception e) {
+            tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+*/
+
+/*
+        try {
+
+            Address address = new Address("city", "street", "10000");
+
+            Member member = new Member();
+            member.setUsername("member1");
+            member.setHomeAddress(address);
+            em.persist(member);
+
+            Address copyAddress = new Address(address.getCity(), address.getStreet(), address.getZipcode());
+
+            Member member2 = new Member();
+            member2.setUsername("member2");
+//            member2.setHomeAddress(address);
+            member2.setHomeAddress(copyAddress); //복사한걸로 넣어준다.
+            em.persist(member2);
+
+            //인스턴스 공유 시 update 쿼리 두 번 나감, 의도 한거면 값 타입을 쓰지말고 Address를 엔티티로 만들어
+            //2. 8 트랜잭션을 지원하는 쓰기 지원, 2. 9 엔티티 수정 - 변경 감지 부분 떠올려보면 왜 insert 후 update 나가는지 알 수 있음.
+            member.getHomeAddress().setCity("newCity");
+
+            tx.commit();
+        } catch(Exception e) {
+            tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+*/
+
+/*
+        try {
+
+            Address address = new Address("city", "street", "10000");
+
+            Member member = new Member();
+            member.setUsername("member1");
+            member.setHomeAddress(address);
+            em.persist(member);
+
+            //setter를 막고 이런식으로 변경한다.
+            Address newAddress = new Address("newCity", address.getStreet(), address.getZipcode());
+            member.setHomeAddress(newAddress);
+
+            tx.commit();
+        } catch(Exception e) {
+            tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+*/
+
+/*
+        try {
+
+            Member member = new Member();
+            member.setUsername("member1");
+            member.setHomeAddress(new Address("homeCity", "street", "10000"));
+
+            member.getFavoriteFoods().add("치킨");
+            member.getFavoriteFoods().add("족발");
+            member.getFavoriteFoods().add("피자");
+
+            member.getAddressHistory().add(new Address("old1", "street", "10000"));
+            member.getAddressHistory().add(new Address("old2", "street", "10000"));
+
+            em.persist(member);
+
+            em.flush();
+            em.clear();
+
+            System.out.println("=========== START ============");
+            Member findMember = em.find(Member.class, member.getId()); //컬렉션들은 지연 로딩
+
+*/
+/*
+            List<Address> addressHistory = findMember.getAddressHistory();
+            System.out.println("=============1==============");
+            for (Address address : addressHistory) {
+                System.out.println("address = " + address.getCity());
+            }
+
+            Set<String> favoriteFoods = findMember.getFavoriteFoods();
+            System.out.println("=============2==============");
+            for (String favoriteFood : favoriteFoods) {
+                System.out.println("favoriteFood = " + favoriteFood);
+            }
+*//*
+
+
+            //homeCity -> newCity
+//            findMember.getHomeAddress().setCity("newCity"); //값 타입 수정 이렇게 하지 말자
+            Address a = findMember.getHomeAddress();
+            findMember.setHomeAddress(new Address("newCity", a.getStreet(), a.getZipcode())); //값 타입 수정
+
+            //치킨 -> 한식
+            findMember.getFavoriteFoods().remove("치킨");
+            findMember.getFavoriteFoods().add("한식");
+
+            //equals를 사용해 찾아 remove 하기 때문에 속성들이 완전히 똑같은 Address 넣어주면 됨 (equals, hashcode 구현)
+            //주인 엔티티와 연관된 모든 데이터를 삭제하는 delete 쿼리 한 번, insert 쿼리 두번 나간다.
+            findMember.getAddressHistory().remove(new Address("old1", "street", "10000"));
+            findMember.getAddressHistory().add(new Address("newCity1", "street", "10000"));
+
+            tx.commit();
+        } catch(Exception e) {
+            tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+*/
+
+        try {
+
+            Member member = new Member();
+            member.setUsername("member1");
+            member.setHomeAddress(new Address("homeCity", "street", "10000"));
+
+            member.getFavoriteFoods().add("치킨");
+            member.getFavoriteFoods().add("족발");
+            member.getFavoriteFoods().add("피자");
+
+            //일대다 단방향 -> insert 후 update
+            member.getAddressHistory().add(new AddressEntity("old1", "street", "10000"));
+            member.getAddressHistory().add(new AddressEntity("old2", "street", "10000"));
+
+            em.persist(member);
+
+            tx.commit();
+        } catch(Exception e) {
+            tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
 
         emf.close();
-    }
-
-    private static void printMember(Member member) {
-        System.out.println("member = " + member.getUsername());
-    }
-
-    private static void printMemberAndTeam(Member member) {
-        String username = member.getUsername();
-        System.out.println("username = " + username);
-
-        Team team = member.getTeam();
-        System.out.println("team = " + team.getName());
     }
 }
 

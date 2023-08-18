@@ -4,25 +4,16 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
 @Entity
-public class Team extends BaseEntity {
-
+public class OneTest {
     @Id @GeneratedValue
     @Column(name = "TEAM_ID")
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy = "team")
-//    @OneToMany
-//    @JoinTable
-//    @JoinColumn(name = "TEAM_ID")
-    private List<Member> members = new ArrayList<>(); //ArrayList로 초기화 -> add 할 떄 NullPointer 안뜸
-
-//    public void addMember(Member member) {
-//        member.setTeam(this);
-//        members.add(member);
-//    }
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "TEAM_ID")
+    private List<ManyTest> members = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -40,12 +31,11 @@ public class Team extends BaseEntity {
         this.name = name;
     }
 
-    public List<Member> getMembers() {
+    public List<ManyTest> getMembers() {
         return members;
     }
 
-    public void setMembers(List<Member> members) {
+    public void setMembers(List<ManyTest> members) {
         this.members = members;
     }
 }
-*/
